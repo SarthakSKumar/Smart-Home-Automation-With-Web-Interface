@@ -1,24 +1,13 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+
 import "./App.css";
-import Button from "./components/Button/Button";
 
 const App = () => {
-    return (
-        <div className='home'>
-            <h1 className='header__title'>Smart Home Automation with web Interface</h1>
-
-            <div className='main'>
-                <div className='row'>
-                    <Button />
-                    <Button />
-                </div>
-                <div className='row'>
-                    <Button />
-                    <Button />
-                </div>
-            </div>
-        </div>
-    );
+  const [temperature, setTemperature] = useState(0);
+  const [humidity, setHumidity] = useState(0);
+  const [soilMoisture, setSoilMoisture] = useState(0);
+  const [reedState, setReedState] = useState(false);
+  return <div className="home">Heylo Bc</div>;
 };
 
 export default App;
