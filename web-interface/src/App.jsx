@@ -11,12 +11,12 @@ import {
   FaDoorOpen,
   FaPowerOff,
   FaWater,
-  FaFillDrip,
 } from "react-icons/fa";
 import { BiCheckboxSquare, BiCheckbox } from "react-icons/bi";
+import Plot from "react-plotly.js";
 
-export default function App() {
-  const [ngrokUrl, setNgrokUrl] = useState("http://0.tcp.in.ngrok.io:16664");
+export default function Dashboard() {
+  const [ngrokUrl, setNgrokUrl] = useState("http://localhost:8888");
   const [urlSet, setUrlSet] = useState(false);
 
   const [temperature, setTemperature] = useState(0);
@@ -24,11 +24,23 @@ export default function App() {
   const [soilMoisture, setSoilMoisture] = useState(0);
   const [reedState, setReedState] = useState(false);
   const [currentTime, setCurrentTime] = useState("");
+
+  const [relayStates, setRelayStates] = useState({
+    relay1: false,
+    relay2: false,
+  });
+  const [temperatureData, setTemperatureData] = useState([]);
+  const [humidityData, setHumidityData] = useState([]);
+  const [soilMoistureData, setSoilMoistureData] = useState([]);
+  const [timeData, setTimeData] = useState([]);
+
   const toggleRelay = async (relayNumber, newState) => {
     await axios.post(
       `${ngrokUrl}/relay${relayNumber}/${newState ? "on" : "off"}`
     );
+    setRelayStates({ ...relayStates, [`relay${relayNumber}`]: newState });
   };
+
   const handleUrlSubmit = (e) => {
     e.preventDefault();
     if (ngrokUrl !== "") {
@@ -43,14 +55,25 @@ export default function App() {
       setSoilMoisture(response.data.soil_moisture);
       setReedState(response.data.reed_switch_state);
       setCurrentTime(moment().tz("Asia/Kolkata").format("hh:mm:ss A"));
-      console.log(currentTime);
+
+      setTemperatureData((prevData) => [
+        ...prevData,
+        { x: new Date(), y: response.data.temperature },
+      ]);
+      setHumidityData((prevData) => [
+        ...prevData,
+        { x: new Date(), y: response.data.humidity },
+      ]);
+      setSoilMoistureData((prevData) => [
+        ...prevData,
+        { x: new Date(), y: response.data.soil_moisture },
+      ]);
     });
   };
 
   useEffect(() => {
-    setInterval(getData, 1000);
-  });
-
+    setInterval(getData, 2000);
+  }, []);
   return (
     <div className="min-h-screen bg-gray-600 py-6 flex flex-col justify-center sm:py-12">
       {urlSet ? (
@@ -78,160 +101,233 @@ export default function App() {
           </form>
         </div>
       ) : (
-        <div className="h-fit bg-gray-600 px-6">
-          <div className="w-full sm:mx-auto">
-            <div className="relative py-8 bg-gray-800 shadow-lg sm:rounded-3xl sm:p-20">
-              <div className="w-full mx-auto">
-                <div>
-                  <img
-                    src="vite.svg"
-                    alt="Smart Home Automation"
-                    className="h-16 mx-auto"
-                  />
-                  <h2 className="text-center text-3xl font-bold text-gray-100 mt-4 mb-8">
-                    Smart Home Automation Dashboard
-                  </h2>
-                  <div className="flex w-full flex-wrap flex-row-reverse">
-                    <div className="flex flex-wrap w-1/2 border-2"></div>
-                    <div className="flex flex-wrap w-1/2 border-2">
-                      <div className="w-full grid grid-cols-3">
-                        <div className="flex items-center h-fit bg-gray-700 px-2 py-5 rounded-xl mx-4">
-                          <div className="flex-shrink-0 bg-green-500 rounded-md p-3">
-                            <FaThermometerHalf />
-                          </div>
-                          <div className="ml-5 w-0 flex-1">
-                            <dt className="text-sm font-medium text-gray-400 truncate">
-                              Temperature
-                            </dt>
-                            <dd className="flex items-baseline">
-                              <div className="text-2xl font-semibold text-gray-100">
-                                {temperature}°C
-                              </div>
-                            </dd>
-                          </div>
-                        </div>
-                        <div className="flex items-center h-fit bg-gray-700 px-4 py-5 rounded-xl mx-4">
-                          <div className="flex-shrink-0 bg-blue-500 rounded-md p-3">
-                            <FaWater />
-                          </div>
-                          <div className="ml-5 w-0 flex-1">
-                            <dt className="text-sm font-medium text-gray-400 truncate">
-                              Humidity
-                            </dt>
-                            <dd className="flex items-baseline">
-                              <div className="text-2xl font-semibold text-gray-100">
-                                {humidity}%
-                              </div>
-                            </dd>
-                          </div>
-                        </div>
-                        <div className="flex items-center h-fit bg-gray-700 px-4 py-5 rounded-xl mx-4">
-                          <div className="flex-shrink-0 bg-yellow-500 rounded-md p-3">
-                            <FaSeedling />
-                          </div>
-                          <div className="ml-5 w-0 flex-1">
-                            <dt className="text-sm font-medium text-gray-400 truncate">
-                              Soil Moisture
-                            </dt>
-                            <dd className="flex items-baseline">
-                              <div className="text-2xl font-semibold text-gray-100">
-                                {soilMoisture}%
-                              </div>
-                            </dd>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="bg-gray-800 overflow-hidden shadow rounded-lg">
-                        <div className="px-4 py-5 sm:p-6">
-                          <div className="flex items-center">
-                            <div
-                              className={`flex-shrink-0 ${
-                                reedState ? "bg-green-500" : "bg-red-500"
-                              } rounded-md p-3`}
-                            >
-                              {reedState ? <FaDoorClosed /> : <FaDoorOpen />}
-                            </div>
-                            <div className="ml-5 w-0 flex-1">
-                              <dt className="text-sm font-medium text-gray-400 truncate">
-                                Door State
-                              </dt>
-                              <dd className="flex items-baseline">
-                                <div
-                                  className={`text-2xl font-semibold ${
-                                    reedState
-                                      ? "text-green-500"
-                                      : "text-red-500"
-                                  }`}
-                                >
-                                  {!reedState ? "Open" : "Closed"}
-                                </div>
-                              </dd>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mt-4 mb-8">
+            <h2 className="text-3xl font-semibold text-gray-100">
+              Smart Home Automation Dashboard
+            </h2>
+          </div>
+          <div className="grid grid-cols-3 gap-6">
+            <div className="bg-gray-700 rounded-xl p-4">
+              <FaThermometerHalf className="text-3xl text-green-500 mb-2" />
+              <h3 className="text-xl font-semibold text-gray-100 mb-2">
+                Temperature
+              </h3>
+              <p className="text-2xl font-semibold text-gray-100">
+                {temperature}°C
+              </p>
+            </div>
+            <div className="bg-gray-700 rounded-xl p-4">
+              <FaTint className="text-3xl text-blue-500 mb-2" />
+              <h3 className="text-xl font-semibold text-gray-100 mb-2">
+                Humidity
+              </h3>
+              <p className="text-2xl font-semibold text-gray-100">
+                {humidity}%
+              </p>
+            </div>
+            <div className="bg-gray-700 rounded-xl p-4">
+              <FaSeedling className="text-3xl text-yellow-500 mb-2" />
+              <h3 className="text-xl font-semibold text-gray-100 mb-2">
+                Soil Moisture
+              </h3>
+              <p className="text-2xl font-semibold text-gray-100">
+                {soilMoisture}%
+              </p>
+            </div>
+          </div>{" "}
+          <div className="mt-8">
+            <div className="bg-gray-800 rounded-xl p-4">
+              <h3 className="text-xl font-semibold text-gray-100 mb-2">
+                Door State
+              </h3>
+              <div className="flex items-center">
+                {reedState ? (
+                  <FaDoorClosed className="text-3xl text-green-500" />
+                ) : (
+                  <FaDoorOpen className="text-3xl text-red-500" />
+                )}
+                <p className="text-2xl font-semibold ml-4">
+                  {reedState ? "Closed" : "Open"}
+                </p>
               </div>
-              <div className="grid grid-cols-2 gap-6 mt-8">
-                <div className="bg-gray-800 overflow-hidden shadow rounded-lg">
-                  <div className="px-4 py-5 sm:p-6">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0 bg-purple-500 rounded-md p-3">
-                        <FaPowerOff className="h-6 w-6 text-gray-800" />
-                      </div>
-                      <div className="ml-5 w-0 flex-1">
-                        <dt className="text-sm font-medium text-gray-400 truncate">
-                          Relay 1 Control
-                        </dt>
-                        <dd className="flex items-center">
-                          <button
-                            onClick={() => toggleRelay(1, true)}
-                            className="px-3 py-2 mr-2 bg-green-500 text-gray-800 rounded shadow"
-                          >
-                            ON
-                          </button>
-                          <button
-                            onClick={() => toggleRelay(1, false)}
-                            className="px-3 py-2 bg-red-500 text-gray-800 rounded shadow"
-                          >
-                            OFF
-                          </button>
-                        </dd>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-gray-800 overflow-hidden shadow rounded-lg">
-                  <div className="px-4 py-5 sm:p-6">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0 bg-purple-500 rounded-md p-3">
-                        <FaPowerOff className="h-6 w-6 text-gray-800" />
-                      </div>
-                      <div className="ml-5 w-0 flex-1">
-                        <dt className="text-sm font-medium text-gray-400 truncate">
-                          Relay 2 Control
-                        </dt>
-                        <dd className="flex items-center">
-                          <button
-                            onClick={() => toggleRelay(2, true)}
-                            className="px-3 py-2 mr-2 bg-green-500 text-gray-800 rounded shadow"
-                          >
-                            ON
-                          </button>
-                          <button
-                            onClick={() => toggleRelay(2, false)}
-                            className="px-3 py-2 bg-red-500 text-gray-800 rounded shadow"
-                          >
-                            OFF
-                          </button>
-                        </dd>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+            </div>
+          </div>
+          <div className="mt-8 grid grid-cols-2 gap-6">
+            <div className="bg-gray-800 rounded-xl p-4">
+              <h3 className="text-xl font-semibold text-gray-100 mb-2">
+                Relay 1 Control
+              </h3>
+              <div className="flex">
+                <button
+                  onClick={() => toggleRelay(1, !relayStates.relay1)}
+                  className={`px-3 py-2 mr-2 ${
+                    relayStates.relay1 ? "bg-red-500" : "bg-green-500"
+                  } text-gray-800 rounded shadow`}
+                  disabled={relayStates.relay1}
+                >
+                  {relayStates.relay1 ? "OFF" : "ON"}
+                </button>
+                <button
+                  onClick={() => toggleRelay(2, !relayStates.relay2)}
+                  className={`px-3 py-2 ${
+                    relayStates.relay2 ? "bg-red-500" : "bg-green-500"
+                  } text-gray-800 rounded shadow`}
+                  disabled={relayStates.relay2}
+                >
+                  {relayStates.relay2 ? "OFF" : "ON"}
+                </button>
               </div>
+            </div>
+            <div className="bg-gray-800 rounded-xl p-4">
+              <h3 className="text-xl font-semibold text-gray-100 mb-2">
+                Relay 2 Control
+              </h3>
+              <div className="flex">
+                <button
+                  onClick={() => toggleRelay(1, !relayStates.relay1)}
+                  className={`px-3 py-2 mr-2 ${
+                    relayStates.relay1 ? "bg-red-500" : "bg-green-500"
+                  } text-gray-800 rounded shadow`}
+                  disabled={relayStates.relay1}
+                >
+                  {relayStates.relay1 ? "OFF" : "ON"}
+                </button>
+                <button
+                  onClick={() => toggleRelay(2, !relayStates.relay2)}
+                  className={`px-3 py-2 ${
+                    relayStates.relay2 ? "bg-red-500" : "bg-green-500"
+                  } text-gray-800 rounded shadow`}
+                  disabled={relayStates.relay2}
+                >
+                  {relayStates.relay2 ? "OFF" : "ON"}
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-gray-800 p-4 rounded-lg">
+              <h4 className="text-lg font-medium text-gray-100 mb-4">
+                Temperature Trend
+              </h4>
+              <Plot
+                className="overflow-hidden w-full h-[350px] flex-auto"
+                data={[
+                  {
+                    x: temperatureData.map((data) => data.x),
+                    y: temperatureData.map((data) => data.y),
+                    type: "scatter",
+                    mode: "lines",
+                    marker: { color: "red" },
+                  },
+                ]}
+                layout={{
+                  width: "100%",
+                  height: 350,
+                  plot_bgcolor: "#2d3748",
+                  paper_bgcolor: "#2d3748",
+                  font: {
+                    color: "white",
+                  },
+                  xaxis: {
+                    showgrid: false,
+                    zeroline: false,
+                  },
+                  yaxis: {
+                    showgrid: false,
+                    zeroline: false,
+                  },
+                }}
+              />
+            </div>
+            <div className="bg-gray-800 p-4 rounded-lg">
+              <h4 className="text-lg font-medium text-gray-100 mb-4">
+                Humidity Trend
+              </h4>
+              <Plot
+                className="overflow-hidden w-full h-[350px] flex-auto"
+                data={[
+                  {
+                    x: humidityData.map((data) => data.x),
+                    y: humidityData.map((data) => data.y),
+                    type: "scatter",
+                    mode: "lines",
+                    marker: { color: "blue" },
+                  },
+                ]}
+                config={{
+                  responsive: true,
+                  displaylogo: false,
+                  modeBarButtonsToRemove: [
+                    "zoom2d",
+                    "pan2d",
+                    "select2d",
+                    "lasso2d",
+                    "zoomIn2d",
+                    "zoomOut2d",
+                    "autoScale2d",
+                    "resetScale2d",
+                    "hoverClosestCartesian",
+                    "hoverCompareCartesian",
+                    "toggleSpikelines",
+                  ],
+                }}
+                layout={{
+                  title: { text: "text" },
+                  xaxis: {
+                    title: "Time",
+                    showgrid: false,
+                    showticklabels: true,
+                  },
+                  yaxis: { title: "ff", showline: false },
+                  margin: { t: 50, b: 40, l: 50, r: 20 },
+                  autosize: true,
+                  showlegend: false,
+                  dragmode: false,
+                  hovermode: "closest",
+                  plot_bgcolor: "#F1F1F1",
+                  paper_bgcolor: "#F1F1F1",
+                }}
+              />
+            </div>
+            <div className="bg-gray-800 p-4 rounded-lg">
+              <h4 className="text-lg font-medium text-gray-100 mb-4 w-fit">
+                Soil Moisture Trend
+              </h4>
+              <Plot
+                className="overflow-y-scroll w-inherit h-[300px] flex-auto"
+                data={[
+                  {
+                    x: soilMoistureData.map((data) => data.x),
+                    y: soilMoistureData.map((data) => data.y),
+                    type: "scatter",
+                    mode: "lines",
+                    marker: { color: "green" },
+                  },
+                  {
+                    type: "bar",
+                    x: soilMoistureData.map((data) => data.x),
+                    y: soilMoistureData.map((data) => data.y),
+                  },
+                ]}
+                layout={{
+                  width: "100%",
+                  height: 350,
+                  plot_bgcolor: "#2d3748",
+                  paper_bgcolor: "#2d3748",
+                  font: {
+                    color: "white",
+                  },
+                  xaxis: {
+                    showgrid: false,
+                    zeroline: false,
+                  },
+                  yaxis: {
+                    showgrid: false,
+                    zeroline: false,
+                  },
+                }}
+              />
             </div>
           </div>
         </div>
