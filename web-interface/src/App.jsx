@@ -124,7 +124,11 @@ export default function Dashboard() {
               ) : (
                 <FaDoorOpen className="text-3xl text-red-500" />
               )}
-              <p className={`text-2xl font-semibold ml-4 ${reedState ? "text-green-500" : "text-red-500"}`}>
+              <p
+                className={`text-2xl font-semibold ml-4 ${
+                  reedState ? "text-green-500" : "text-red-500"
+                }`}
+              >
                 {reedState ? "Closed" : "Open"}
               </p>
             </div>
