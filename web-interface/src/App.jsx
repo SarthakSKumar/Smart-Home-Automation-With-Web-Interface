@@ -16,7 +16,7 @@ import { BiCheckboxSquare, BiCheckbox } from "react-icons/bi";
 import Plot from "react-plotly.js";
 
 export default function Dashboard() {
-  const [ngrokUrl, setNgrokUrl] = useState("http://localhost:8888");
+  const [ngrokUrl, setNgrokUrl] = useState(import.meta.env.VITE_API_URL);
   const [urlSet, setUrlSet] = useState(false);
 
   const [temperature, setTemperature] = useState(0);
@@ -49,6 +49,7 @@ export default function Dashboard() {
   };
 
   const getData = async () => {
+    console.log(ngrokUrl);
     await axios.get(`${ngrokUrl}/data`).then((response) => {
       setTemperature(response.data.temperature);
       setHumidity(response.data.humidity);
@@ -72,7 +73,7 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    setInterval(getData, 2000);
+    setInterval(getData, 3000);
   }, []);
   return (
     <div className="min-h-screen bg-gray-600 py-6 flex flex-col justify-center sm:py-12">
@@ -218,41 +219,7 @@ export default function Dashboard() {
                     y: temperatureData.map((data) => data.y),
                     type: "scatter",
                     mode: "lines",
-                    marker: { color: "red" },
-                  },
-                ]}
-                layout={{
-                  width: "100%",
-                  height: 350,
-                  plot_bgcolor: "#2d3748",
-                  paper_bgcolor: "#2d3748",
-                  font: {
-                    color: "white",
-                  },
-                  xaxis: {
-                    showgrid: false,
-                    zeroline: false,
-                  },
-                  yaxis: {
-                    showgrid: false,
-                    zeroline: false,
-                  },
-                }}
-              />
-            </div>
-            <div className="bg-gray-800 p-4 rounded-lg">
-              <h4 className="text-lg font-medium text-gray-100 mb-4">
-                Humidity Trend
-              </h4>
-              <Plot
-                className="overflow-hidden w-full h-[350px] flex-auto"
-                data={[
-                  {
-                    x: humidityData.map((data) => data.x),
-                    y: humidityData.map((data) => data.y),
-                    type: "scatter",
-                    mode: "lines",
-                    marker: { color: "blue" },
+                    marker: { color: "#00ffca" },
                   },
                 ]}
                 config={{
@@ -273,7 +240,56 @@ export default function Dashboard() {
                   ],
                 }}
                 layout={{
-                  title: { text: "text" },
+                  width: "100%",
+                  height: 350,
+                  plot_bgcolor: "#2d3748",
+                  paper_bgcolor: "#2d3748",
+                  font: {
+                    color: "white",
+                  },
+                  xaxis: {
+                    title: "Time",
+                    showgrid: false,
+                    showticklabels: true,
+                  },
+                  yaxis: { title: "ff", showline: false },
+                }}
+              />
+            </div>
+            <div className="bg-gray-800 p-4 rounded-lg">
+              <h4 className="text-lg font-medium text-gray-100 mb-4">
+                Humidity Trend
+              </h4>
+              <Plot
+                className="overflow-hidden w-full h-[350px] flex-auto"
+                data={[
+                  {
+                    x: humidityData.map((data) => data.x),
+                    y: humidityData.map((data) => data.y),
+                    type: "scatter",
+                    mode: "lines",
+                    marker: { color: "#19a7ce" },
+                  },
+                ]}
+                config={{
+                  responsive: true,
+                  displaylogo: false,
+                  modeBarButtonsToRemove: [
+                    "zoom2d",
+                    "pan2d",
+                    "select2d",
+                    "lasso2d",
+                    "zoomIn2d",
+                    "zoomOut2d",
+                    "autoScale2d",
+                    "resetScale2d",
+                    "hoverClosestCartesian",
+                    "hoverCompareCartesian",
+                    "toggleSpikelines",
+                  ],
+                }}
+                layout={{
+                  title: { text: "Humidity" },
                   xaxis: {
                     title: "Time",
                     showgrid: false,
@@ -285,47 +301,58 @@ export default function Dashboard() {
                   showlegend: false,
                   dragmode: false,
                   hovermode: "closest",
-                  plot_bgcolor: "#F1F1F1",
-                  paper_bgcolor: "#F1F1F1",
+                  plot_bgcolor: "#2d3748",
+                  paper_bgcolor: "#2d3748",
                 }}
               />
             </div>
             <div className="bg-gray-800 p-4 rounded-lg">
-              <h4 className="text-lg font-medium text-gray-100 mb-4 w-fit">
+              <h4 className="text-lg font-medium text-gray-100 mb-4">
                 Soil Moisture Trend
               </h4>
               <Plot
-                className="overflow-y-scroll w-inherit h-[300px] flex-auto"
+                className="overflow-hidden w-full h-[350px] flex-auto"
                 data={[
                   {
                     x: soilMoistureData.map((data) => data.x),
                     y: soilMoistureData.map((data) => data.y),
                     type: "scatter",
                     mode: "lines",
-                    marker: { color: "green" },
-                  },
-                  {
-                    type: "bar",
-                    x: soilMoistureData.map((data) => data.x),
-                    y: soilMoistureData.map((data) => data.y),
+                    marker: { color: "#feff86" },
                   },
                 ]}
+                config={{
+                  responsive: true,
+                  displaylogo: false,
+                  modeBarButtonsToRemove: [
+                    "zoom2d",
+                    "pan2d",
+                    "select2d",
+                    "lasso2d",
+                    "zoomIn2d",
+                    "zoomOut2d",
+                    "autoScale2d",
+                    "resetScale2d",
+                    "hoverClosestCartesian",
+                    "hoverCompareCartesian",
+                    "toggleSpikelines",
+                  ],
+                }}
                 layout={{
-                  width: "100%",
-                  height: 350,
+                  title: { text: "Soil Moisture" },
+                  xaxis: {
+                    title: "Time",
+                    showgrid: false,
+                    showticklabels: true,
+                  },
+                  yaxis: { title: "Value in %", showline: false },
+                  margin: { t: 50, b: 40, l: 50, r: 20 },
+                  autosize: true,
+                  showlegend: false,
+                  dragmode: false,
+                  hovermode: "closest",
                   plot_bgcolor: "#2d3748",
                   paper_bgcolor: "#2d3748",
-                  font: {
-                    color: "white",
-                  },
-                  xaxis: {
-                    showgrid: false,
-                    zeroline: false,
-                  },
-                  yaxis: {
-                    showgrid: false,
-                    zeroline: false,
-                  },
                 }}
               />
             </div>
