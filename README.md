@@ -6,6 +6,7 @@
 ## Table of Contents
 - [Description](#description)
 - [Components Used](#components-used)
+- [Screenshots](#screenshots)
 - [Team Members](#team-members)
 - [Installation](#installation)
 - [Usage](#usage)
@@ -27,6 +28,13 @@ The Smart Home Automation project is designed to create an efficient, user-frien
 - Magnetic Reed Switch: A switch that detects the opening and closing of doors or windows, enhancing home security.
 - DHT11 Temperature/Humidity Sensor: A sensor that measures ambient temperature and humidity, providing data for climate control.
 
+## Screenshots 
+
+ ![Screenshot Image](screenshot/first.png "Smart Home Automation-1")
+
+ ![Screenshot Image](screenshot/second.png "Smart Home Automation-2")
+
+ ![Screenshot Image](screenshot/third.png "Smart Home Automation-3")
 
 ## Team Members 
 
