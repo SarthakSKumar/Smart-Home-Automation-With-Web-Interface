@@ -3,7 +3,7 @@ import socket
 import os
 
 # Get the public URL from ngrok
-public_url = ngrok.connect(8888, "tcp")
+public_url = ngrok.connect("192.168.77.856:8888", "tcp")
 print(public_url)
 
 # Extract the host and port from the public URL

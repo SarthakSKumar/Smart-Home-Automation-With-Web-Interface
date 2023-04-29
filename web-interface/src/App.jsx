@@ -16,7 +16,7 @@ import { BiCheckboxSquare, BiCheckbox } from "react-icons/bi";
 import Plot from "react-plotly.js";
 
 export default function Dashboard() {
-  const [ngrokUrl, setNgrokUrl] = useState(import.meta.env.VITE_API_URL);
+  const [ngrokUrl, setNgrokUrl] = useState("http://0.tcp.in.ngrok.io:15416");
   const [urlSet, setUrlSet] = useState(false);
 
   const [temperature, setTemperature] = useState(0);
