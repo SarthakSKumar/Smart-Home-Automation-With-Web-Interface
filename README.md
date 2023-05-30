@@ -30,11 +30,16 @@ The Smart Home Automation project is designed to create an efficient, user-frien
 
 ## Screenshots 
 
- ![Smart Home Automation-1](screenshot/first.png )
+ ![Smart Home Automation-1](Images/IMG-20230421-WA0008.jpg)
 
- ![Smart Home Automation-1](screenshot/second.png)
+ ![Smart Home Automation-2](Images/Screenshot 2023-03-19 175543.png)
 
- ![Smart Home Automation-1](screenshot/third.png )
+ ![Smart Home Automation-3](Images/Screenshot 2023-03-24 141626.png)
+ 
+ ![Smart Home Automation-4](Images/Screenshot 2023-03-24 142330.png)
+ 
+ ![Smart Home Automation-5](Images/Screenshot 2023-04-22 224034.png)
+
 
 ## Team Members 
 
