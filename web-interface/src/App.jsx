@@ -83,7 +83,7 @@ export default function Dashboard() {
             Smart Home Dashboard
           </h2>
           <h2 className="text-sm text-gray-400">
-            Currently Connected to {ngrokUrl}
+            Connecting...
           </h2>
         </div>
         <div className="grid grid-cols-3 gap-6 w-full">
